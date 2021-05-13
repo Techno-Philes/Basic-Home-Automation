@@ -19,7 +19,7 @@ We are going to connect our Arduino and relay module using AC Power Source. Then
 After finishing these steps, our **Basic Home Automation System** is ready!!
 
 ![GitHub forks](https://img.shields.io/github/forks/Techno-Philes/Basic-Home-Automation?logo=Forks&style=social)
-![GitHub Repo stars](https://img.shields.io/github/stars/Techno-Philes/Blogs?style=social)
+![GitHub Repo stars](https://img.shields.io/github/stars/Techno-Philes/Basic-Home-Automation?style=social)
 ![GitHub watchers](https://img.shields.io/github/watchers/Techno-Philes/Basic-Home-Automation?logo=Watchers&?style=social)
 ![GitHub last commit](https://img.shields.io/github/last-commit/Techno-Philes/Basic-Home-Automation?style=plastic&logo=appveyor)
 ![Visits](http://estruyf-github.azurewebsites.net/api/VisitorHit?user=Technophiles&repo=Music-Player-GUI-visitors-badge&countColorcountColor&countColor=%237B1E7A?style=social)
