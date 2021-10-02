@@ -20,14 +20,12 @@
 #define RelayPin2 4  //D2
 #define RelayPin3 14 //D5
 #define RelayPin4 12 //D6
-// A 5V single relay module should be connected with the circuit
-#define RelayPin5 3
+
 
 #define SwitchPin1 10  //SD3
 #define SwitchPin2 0   //D3 
 #define SwitchPin3 13  //D7
 #define SwitchPin4 3   //RX
-#define SwitchPin5 9   //D9
 
 #define wifiLed   16   //D0
 
@@ -102,18 +100,6 @@ void relayOnOff(int relay){
               digitalWrite(RelayPin4, HIGH); // turn off relay 4
               toggleState_4 = 1;
               Serial.println("Device4 OFF");
-             }
-             delay(100);
-      case 5: 
-             if(toggleState_5 == 1){
-              digitalWrite(RelayPin5, LOW); // turn on relay 4
-              toggleState_5 = 0;
-              Serial.println("Device5 ON");
-             }
-             else{
-              digitalWrite(RelayPin5, HIGH); // turn off relay 4
-              toggleState_5 = 1;
-              Serial.println("Device5 OFF");
              }
              delay(100);
       break;
