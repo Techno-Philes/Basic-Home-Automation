@@ -15,31 +15,13 @@
 //#define BLYNK_PRINT Serial            
 #include <BlynkSimpleEsp8266.h>
 
-// define the GPIO connected with Relays and switches
-#define RelayPin1 5  //D1
-#define RelayPin2 4  //D2
-#define RelayPin3 14 //D5
-#define RelayPin4 12 //D6
-
-
-#define SwitchPin1 10  //SD3
-#define SwitchPin2 0   //D3 
-#define SwitchPin3 13  //D7
-#define SwitchPin4 3   //RX
-
 #define wifiLed   16   //D0
 
-//Change the virtual pins according the rooms
-#define VPIN_BUTTON_1    V1 
-#define VPIN_BUTTON_2    V2
-#define VPIN_BUTTON_3    V3 
-#define VPIN_BUTTON_4    V4
-#define VPIN_BUTTON_5    V5
+const int relayPins[] = {5, 4, 14, 12, 6};
+const int switchPins[] = {10, 0, 13, 3, 7};
+bool toggleStates[] = {true, true, true, true, true};
 
-int toggleState_1 = 1; //Define integer to remember the toggle state for relay 1
-int toggleState_2 = 1; //Define integer to remember the toggle state for relay 2
-int toggleState_3 = 1; //Define integer to remember the toggle state for relay 3
-int toggleState_4 = 1; //Define integer to remember the toggle state for relay 4
+const int vpinButtons[] = {V1, V2, V3, V4, V5};
 
 int wifiFlag = 0;
 
@@ -49,203 +31,90 @@ int wifiFlag = 0;
 
 BlynkTimer timer;
 
+/// Function to toggle the relay based on current toggle state for it
 void relayOnOff(int relay){
-    switch(relay){
-      case 1: 
-             if(toggleState_1 == 1){
-              digitalWrite(RelayPin1, LOW); // turn on relay 1
-              toggleState_1 = 0;
-              Serial.println("Device1 ON");
-             }
-             else{
-              digitalWrite(RelayPin1, HIGH); // turn off relay 1
-              toggleState_1 = 1;
-              Serial.println("Device1 OFF");
-             }
-             delay(100);
-      break;
-      case 2: 
-             if(toggleState_2 == 1){
-              digitalWrite(RelayPin2, LOW); // turn on relay 2
-              toggleState_2 = 0;
-              Serial.println("Device2 ON");
-             }
-             else{
-              digitalWrite(RelayPin2, HIGH); // turn off relay 2
-              toggleState_2 = 1;
-              Serial.println("Device2 OFF");
-             }
-             delay(100);
-      break;
-      case 3: 
-             if(toggleState_3 == 1){
-              digitalWrite(RelayPin3, LOW); // turn on relay 3
-              toggleState_3 = 0;
-              Serial.println("Device3 ON");
-             }
-             else{
-              digitalWrite(RelayPin3, HIGH); // turn off relay 3
-              toggleState_3 = 1;
-              Serial.println("Device3 OFF");
-             }
-             delay(100);
-      break;
-      case 4: 
-             if(toggleState_4 == 1){
-              digitalWrite(RelayPin4, LOW); // turn on relay 4
-              toggleState_4 = 0;
-              Serial.println("Device4 ON");
-             }
-             else{
-              digitalWrite(RelayPin4, HIGH); // turn off relay 4
-              toggleState_4 = 1;
-              Serial.println("Device4 OFF");
-             }
-             delay(100);
-      break;
-      default : break;      
-      }  
+    if (toggleStates[relay - 1]) {
+        digitalWrite(relayPins[relay - 1], LOW);
+        toggleStates[relay - 1] = false;
+        Serial.print("Device");
+        Serial.print(relay);
+        Serial.println(" ON");
+    } else {
+        digitalWrite(relayPins[relay - 1], HIGH);
+        toggleStates[relay - 1] = true;
+        Serial.print("Device");
+        Serial.print(relay);
+        Serial.println(" OFF");
+    }
+    delay(100);
 }
 
-void with_internet(){
-    //Manual Switch Control
-    if (digitalRead(SwitchPin1) == LOW){
+/// Switch Control based on whether operation is being run with internet or not.
+void switch_control(bool withInternet = false){
+  for (int i = 0; i < sizeof(switchPins) / sizeof(switchPins[0]); ++i) {
+    if (digitalRead(switchPins[i]) == LOW){
       delay(200);
-      relayOnOff(1); 
-      Blynk.virtualWrite(VPIN_BUTTON_1, toggleState_1);   // Update Button Widget  
+      relayOnOff(i + 1); 
+      if (withInternet) Blynk.virtualWrite(vpinButtons[i], toggleStates[i]);   // Update Button Widget  
     }
-    else if (digitalRead(SwitchPin2) == LOW){
-      delay(200);
-      relayOnOff(2);      
-      Blynk.virtualWrite(VPIN_BUTTON_2, toggleState_2);   // Update Button Widget
-    }
-    else if (digitalRead(SwitchPin3) == LOW){
-      delay(200);
-      relayOnOff(3);
-      Blynk.virtualWrite(VPIN_BUTTON_3, toggleState_3);   // Update Button Widget
-    }
-    else if (digitalRead(SwitchPin4) == LOW){
-      delay(200);
-      relayOnOff(4);
-      Blynk.virtualWrite(VPIN_BUTTON_4, toggleState_4);   // Update Button Widget
-    }
-}
-void without_internet(){
-    //Manual Switch Control
-    if (digitalRead(SwitchPin1) == LOW){
-      delay(200);
-      relayOnOff(1);      
-    }
-    else if (digitalRead(SwitchPin2) == LOW){
-      delay(200);
-      relayOnOff(2);
-    }
-    else if (digitalRead(SwitchPin3) == LOW){
-      delay(200);
-      relayOnOff(3);
-    }
-    else if (digitalRead(SwitchPin4) == LOW){
-      delay(200);
-      relayOnOff(4);
-    }
-}
-
-//BLYNK_CONNECTED() {
-//  // Request the latest state from the server
-//  Blynk.syncVirtual(VPIN_BUTTON_1);
-//  Blynk.syncVirtual(VPIN_BUTTON_2);
-//  Blynk.syncVirtual(VPIN_BUTTON_3);
-//  Blynk.syncVirtual(VPIN_BUTTON_4);
-//}
-
-// When App button is pushed - switch the state
-
-BLYNK_WRITE(VPIN_BUTTON_1) {
-  toggleState_1 = param.asInt();
-  digitalWrite(RelayPin1, toggleState_1);
-}
-
-BLYNK_WRITE(VPIN_BUTTON_2) {
-  toggleState_2 = param.asInt();
-  digitalWrite(RelayPin2, toggleState_2);
-}
-
-BLYNK_WRITE(VPIN_BUTTON_3) {
-  toggleState_3 = param.asInt();
-  digitalWrite(RelayPin3, toggleState_3);
-}
-
-BLYNK_WRITE(VPIN_BUTTON_4) {
-  toggleState_4 = param.asInt();
-  digitalWrite(RelayPin4, toggleState_4);
-}
-
-void checkBlynkStatus() { // called every 3 seconds by SimpleTimer
-
-  bool isconnected = Blynk.connected();
-  if (isconnected == false) {
-    wifiFlag = 1;
   }
-  if (isconnected == true) {
+}
+
+/// When App button is pushed - switch the state
+BLYNK_WRITE(VPIN_BUTTON) {
+  toggleState[VPIN_BUTTON - 1] = param.asInt();
+  digitalWrite(relayPins[VPIN_BUTTON - 1], toggleStates[VPIN_BUTTON - 1]);
+}
+
+/// Called every 3 seconds by SimpleTimer to check Blynk Status
+void checkBlynkStatus() {
+  if (Blynk.connected() == false) wifiFlag = 1;
+  else {
     wifiFlag = 0;
-    Blynk.virtualWrite(VPIN_BUTTON_1, toggleState_1);
-    /*Blynk.virtualWrite(VPIN_BUTTON_2, toggleState_2);
-    Blynk.virtualWrite(VPIN_BUTTON_3, toggleState_3);
-    Blynk.virtualWrite(VPIN_BUTTON_4, toggleState_4);*/
+    Blynk.virtualWrite(vpinButtons[0], toggleStates[0]);
   }
 }
-void setup()
-{
+
+void setup() {
   Serial.begin(9600);
 
-  pinMode(RelayPin1, OUTPUT);
-  pinMode(RelayPin2, OUTPUT);
-  pinMode(RelayPin3, OUTPUT);
-  pinMode(RelayPin4, OUTPUT);
-
+  // Wifi LED setup
   pinMode(wifiLed, OUTPUT);
-
-  pinMode(SwitchPin1, INPUT_PULLUP);
-  pinMode(SwitchPin2, INPUT_PULLUP);
-  pinMode(SwitchPin3, INPUT_PULLUP);
-  pinMode(SwitchPin4, INPUT_PULLUP);
-
-  //During Starting all Relays should TURN OFF
-  digitalWrite(RelayPin1, toggleState_1);
-  digitalWrite(RelayPin2, toggleState_2);
-  digitalWrite(RelayPin3, toggleState_3);
-  digitalWrite(RelayPin4, toggleState_4);
-
   digitalWrite(wifiLed, HIGH);
 
+  // Switch pins, relay pins setup
+  for (int i = 0; i < sizeof(relayPins) / sizeof(relayPins[0]); ++i) {
+    // Set up pinmodes
+    pinMode(relayPins[i], OUTPUT);
+    pinMode(switchPins[i], INPUT_PULLUP);
+
+    //During Starting all Relays should TURN OFF
+    digitalWrite(relayPins[i], toggleStates[i]);
+  }
+
+  // Set up WiFi
   WiFi.begin(WIFI_SSID, WIFI_PASS);
   timer.setInterval(3000L, checkBlynkStatus); // check if Blynk server is connected every 3 seconds
   Blynk.config(AUTH);
   delay(1000);
 
-  Blynk.virtualWrite(VPIN_BUTTON_1, toggleState_1);
-  Blynk.virtualWrite(VPIN_BUTTON_2, toggleState_2);
-  Blynk.virtualWrite(VPIN_BUTTON_3, toggleState_3);
-  Blynk.virtualWrite(VPIN_BUTTON_4, toggleState_4);
+  // Set up Blynk virtual buttons
+  for (int i = 0; i < sizeof(vpinButtons) / sizeof(vpinButtons[0]); ++i) {
+    Blynk.virtualWrite(vpinButtons[i], toggleStates[i]);
+  }
 }
 
-void loop()
-{  
-  if (WiFi.status() != WL_CONNECTED)
-  {
+void loop() {  
+  if (WiFi.status() != WL_CONNECTED) {
     //Serial.println("WiFi Not Connected");
     digitalWrite(wifiLed, HIGH);
   }
-  else
-  {
+  else {
     //+Serial.println("WiFi Connected");
     digitalWrite(wifiLed, LOW); //Turn on WiFi LED
     Blynk.run();
   }
 
   timer.run(); // Initiates SimpleTimer
-  if (wifiFlag == 0)
-    with_internet();
-  else
-    without_internet();
+  switch_control(wifiFlag == 0);
 }
