@@ -13,18 +13,21 @@
  **********************************************************************************/
 
 //#define BLYNK_PRINT Serial            
-#include <BlynkSimpleEsp8266.h> 
+#include <BlynkSimpleEsp8266.h>
 
 // define the GPIO connected with Relays and switches
 #define RelayPin1 5  //D1
 #define RelayPin2 4  //D2
 #define RelayPin3 14 //D5
 #define RelayPin4 12 //D6
+// A 5V single relay module should be connected with the circuit
+#define RelayPin5 3
 
 #define SwitchPin1 10  //SD3
 #define SwitchPin2 0   //D3 
 #define SwitchPin3 13  //D7
 #define SwitchPin4 3   //RX
+#define SwitchPin5 9   //D9
 
 #define wifiLed   16   //D0
 
@@ -33,6 +36,7 @@
 #define VPIN_BUTTON_2    V2
 #define VPIN_BUTTON_3    V3 
 #define VPIN_BUTTON_4    V4
+#define VPIN_BUTTON_5    V5
 
 int toggleState_1 = 1; //Define integer to remember the toggle state for relay 1
 int toggleState_2 = 1; //Define integer to remember the toggle state for relay 2
@@ -41,7 +45,7 @@ int toggleState_4 = 1; //Define integer to remember the toggle state for relay 4
 
 int wifiFlag = 0;
 
-#define AUTH " t-e5pObXxGhXKbYI6T6Uwc4Mp2fYvvtw"                 // You should get Auth Token in the Blynk App.  
+#define AUTH "Auth-token-blynk"                 // You should get Auth Token in the Blynk App.  
 #define WIFI_SSID "Karthik Mothiki"             //Enter Wifi Name
 #define WIFI_PASS "11112002"         //Enter wifi Password
 
@@ -54,12 +58,12 @@ void relayOnOff(int relay){
               digitalWrite(RelayPin1, LOW); // turn on relay 1
               toggleState_1 = 0;
               Serial.println("Device1 ON");
-              }
+             }
              else{
               digitalWrite(RelayPin1, HIGH); // turn off relay 1
               toggleState_1 = 1;
               Serial.println("Device1 OFF");
-              }
+             }
              delay(100);
       break;
       case 2: 
@@ -67,12 +71,12 @@ void relayOnOff(int relay){
               digitalWrite(RelayPin2, LOW); // turn on relay 2
               toggleState_2 = 0;
               Serial.println("Device2 ON");
-              }
+             }
              else{
               digitalWrite(RelayPin2, HIGH); // turn off relay 2
               toggleState_2 = 1;
               Serial.println("Device2 OFF");
-              }
+             }
              delay(100);
       break;
       case 3: 
@@ -80,12 +84,12 @@ void relayOnOff(int relay){
               digitalWrite(RelayPin3, LOW); // turn on relay 3
               toggleState_3 = 0;
               Serial.println("Device3 ON");
-              }
+             }
              else{
               digitalWrite(RelayPin3, HIGH); // turn off relay 3
               toggleState_3 = 1;
               Serial.println("Device3 OFF");
-              }
+             }
              delay(100);
       break;
       case 4: 
@@ -93,12 +97,24 @@ void relayOnOff(int relay){
               digitalWrite(RelayPin4, LOW); // turn on relay 4
               toggleState_4 = 0;
               Serial.println("Device4 ON");
-              }
+             }
              else{
               digitalWrite(RelayPin4, HIGH); // turn off relay 4
               toggleState_4 = 1;
               Serial.println("Device4 OFF");
-              }
+             }
+             delay(100);
+      case 5: 
+             if(toggleState_5 == 1){
+              digitalWrite(RelayPin5, LOW); // turn on relay 4
+              toggleState_5 = 0;
+              Serial.println("Device5 ON");
+             }
+             else{
+              digitalWrite(RelayPin5, HIGH); // turn off relay 4
+              toggleState_5 = 1;
+              Serial.println("Device5 OFF");
+             }
              delay(100);
       break;
       default : break;      
